@@ -1,0 +1,20 @@
+#include <iostream>
+using namespace std;
+int main()
+{
+	int N; int count = 0; int det = 0;
+	cin >> N;
+	int* arr = new int[N];
+	for (int i = 0; i < N; i++) cin >> arr[i];
+	while (!(det & (1 << N))) {
+		det++;
+		double tmp = 0;
+		for (int k = 0; k < N; k++)
+			if ((1 << k) & det)
+				tmp += (1 / (double)arr[k]);
+		if ((0.99 <= tmp) && (tmp <= 1.01))
+			count++;
+	}
+	cout << count;
+	return 0;
+}
