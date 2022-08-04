@@ -1,0 +1,8 @@
+/*
+when use?
+ -> arranged structure searching.
+idea. based on middle value, 
+if(purpose value > middle value) left index move to (left+right)/2, right index motionless
+else if(purpose value < middle value) right index move to (left+right)/2, left index motionless
+recursive function or while loop
+*/
