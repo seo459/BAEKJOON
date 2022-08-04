@@ -1,0 +1,25 @@
+void non_recursive_quicksort(int** arr, int left, int right, char ch)
+{
+	int s = 0;
+	int stack[128];
+	stack[s++] = left;
+	stack[s++] = right;
+	while (s > 0)
+	{
+		if (left >= right) return;
+		left = stack[s--];
+		right = stack[s--];
+		int pivot = left;
+		int low = left + 1, high = right;
+		while (low < high) {
+			while (arr[low][0] < arr[pivot][0] && low < high)
+				low++;
+			while (arr[high][0] > arr[pivot][0] && low < high)
+				high--;
+			swap(arr, low, high);
+		}
+		swap(arr, pivot, high);
+		stack[s++] = high + 1; //new left
+		stack[s++] = high - 1; //new right
+	}
+}
