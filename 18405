@@ -2,56 +2,59 @@
 #include <deque>
 
 using namespace std;
-int arr[200 + 2][200 + 2];
+int arr[200 + 2][200 + 2] = {0};
+int dx[4] = { 0, 0, 1, -1 }; int dy[4] = { 1, -1, 0, 0 };
 int X = 1, Y = 1;
-int S = 0;
-deque <pair<int,int>> Q;
-bool vicinity_smaller(int x, int y)
+int S = 0; int cnt[400] = { 0 }; int t = 0;
+deque <pair<int, pair<int,int>>> Q;
+
+int vicinity_min(int x, int y)
 {
-	int val = arr[x][y];
-	if (val <= arr[x + 1][y] && val <= arr[x - 1][y] && val <= arr[x][y + 1] && val <= arr[x][y - 1])
-		return true;
-	else return false;
+	int min = 9999;
+	for (int i = 0; i < 4; i++)
+		if ((arr[x + dx[i]][y + dy[i]] < min) && (arr[x+dx[i]][y+dy[i]] != 0))
+			min = arr[x + dx[i]][y + dy[i]];
+	return min;
 }
 void func()
 {
-	int x = Q.front().first;
-	int y = Q.front().second;
-	Q.pop_front();
-	int val = arr[x][y];
-	if (arr[x + 1][y] == 0 && vicinity_smaller(x + 1, y))
+	while (cnt[t] > 0)
 	{
-		arr[x + 1][y] = val;
-		Q.push_back(make_pair(x + 1, y));
+		int x = Q.front().first;
+		int y = Q.front().second.first;
+		Q.pop_front(); cnt[t]--;
+		for (int i = 0; i < 4; i++)
+		{
+			if (arr[x + dx[i]][y + dy[i]] == 0) {
+				Q.push_back(make_pair(x + dx[i], make_pair(y + dy[i], vicinity_min(x + dx[i], y + dy[i]))));
+				cnt[t + 1]++;
+			}
+		}
 	}
-	if (arr[x - 1][y] == 0 && vicinity_smaller(x - 1, y))
-	{
-		arr[x - 1][y] = val;
-		Q.push_back(make_pair(x - 1, y));
+	if (cnt[t] == 0) { //renew arr by Q value
+		int i = 0;
+		while (i < Q.size())
+		{
+			arr[Q[i].first][Q[i].second.first] = Q[i].second.second;
+			i++;
+		}
 	}
-	if (arr[x][y + 1] == 0 && vicinity_smaller(x, y + 1))
-	{
-		arr[x][y + 1] = val;
-		Q.push_back(make_pair(x, y + 1));
-	}
-	if (arr[x][y - 1] == 0 && vicinity_smaller(x, y - 1))
-	{
-		arr[x][y - 1] = val;
-		Q.push_back(make_pair(x, y - 1));
-	}
+	t++;
 }
 void set()
 {
 	int N, K;
-	cin >> N >> K; 
-	for (int i = 1; i < N + 1; i++)
-		for (int j = 1; j < N + 1; j++)
+	cin >> N >> K;
+	for (int i = 1; i <= N; i++)
+		for (int j = 1; j <= N; j++)
 		{
 			cin >> arr[i][j];
 			if (arr[i][j] != 0)
-				Q.push_back(make_pair(i, j));
+			{
+				Q.push_back(make_pair(i, make_pair(j,arr[i][j]))); cnt[0]++;
+			}
 		}
-	// 2차원 동적배열 초기화
+	// 2-dimension array setting
 	for (int i = 0; i < N + 2; i++) arr[i][0] = 9999;
 	for (int i = 0; i < N + 2; i++) arr[0][i] = 9999;
 	for (int i = 0; i < N + 2; i++) arr[N + 1][i] = 9999;
@@ -61,12 +64,21 @@ void set()
 int main()
 {
 	set();
-	while (S)
-	{
+	while (S != t)
 		func();
-		S--;
-	}
-	cout << arr[X+1][Y+1];
-	
+
+	if (arr[X][Y] != 0) cout << arr[X][Y];
+	else cout << "0";
 	return 0;
+	/* for test
+	cout << "\n" ;
+	for (int i = 1; i < 5 + 1; i++)
+	{
+		for (int j = 1; j < 5 + 1; j++)
+		{
+			cout << arr[i][j] << " ";
+		}
+		cout << "\n";
+	}
+	*/
 }
