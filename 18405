@@ -20,6 +20,7 @@ void func()
 {
 	while (cnt[t] > 0)
 	{
+		if(Q.size() ==0) break; //fix error - Runtime(DoubleFree)
 		int x = Q.front().first;
 		int y = Q.front().second.first;
 		Q.pop_front(); cnt[t]--;
