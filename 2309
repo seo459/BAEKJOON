@@ -1,0 +1,38 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+#define K 9
+int main()
+{
+	vector <int> vec;
+	for (int i = 0; i < K; i++)
+	{
+		int tmp;
+		cin >> tmp;
+		vec.push_back(tmp);
+	}
+	sort(vec.begin(), vec.end());
+	for (int det = 1; det < pow(2, K); det++)
+	{
+		int sum = 0; int cnt = 0;
+		bool visit[K] = { false };
+		for (int i = 0; i < K; i++)
+		{
+			if ((1 << i) & det)
+			{
+				sum += vec[i];
+				visit[i]=true;  cnt++;
+			}
+			if (sum == 100 && cnt ==7) 
+			{
+				for (int j = 0; j < K; j++)
+					if (visit[j] == true)
+						cout << vec[j] << "\n";
+				return 0;
+			}
+		}
+	}
+	return 0;
+}
