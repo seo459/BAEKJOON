@@ -3,20 +3,11 @@
 #include <algorithm>
 #include <deque>
 using namespace std;
-bool isin(vector <int>& v, int x)
-{
-	for (auto it = v.begin(); it != v.end(); it++)
-		if (x == *it) 
-			return true;
-
-	return false;
-}
 bool can_simultaneous(vector <vector<int>>& vec, int x, int y) //premised arranged setting
 {
 	for (auto it = vec[x].begin(); it != vec[x].end(); it++)
 		if (*it == y) 
 			return false;
-	
 	return true;
 }
 int main()
@@ -56,6 +47,5 @@ int main()
 			}
 		}
 	}
-	
 	return 0;
 }
