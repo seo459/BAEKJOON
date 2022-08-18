@@ -1,0 +1,48 @@
+#include <iostream>
+using namespace std;
+
+void quicksort(int* arr, int left, int right)
+{
+	int s = 0;
+	int stack[128] = { 0 };
+	stack[s++] = left;
+	stack[s++] = right;
+	while (s > 0)
+	{
+		left = stack[s--];
+		right = stack[s--];
+		int pivot = left;
+		int low = left + 1, high = right;
+		while (low < high)
+		{
+			while (low < right && arr[low] <= arr[pivot])
+				low++;
+			while ((high > left + 1) && (arr[high] >= arr[pivot]) && (high >= low)) //attention boundary condition
+				high--; //1st condition : high(idx) can't invade to 'pivot(idx)' , 3rd condition : if high and low crossed, these distance <= 1
+			int tmp = arr[low];
+			arr[low] = arr[high];
+			arr[high] = tmp;
+		}
+		if (low >= high) {
+			int tmp2 = arr[pivot];
+			arr[pivot] = arr[high];
+			arr[high] = tmp2;
+			if (high - left > 0) {
+				stack[s++] = left;
+				stack[s++] = high - 1;
+			}
+			if (right - high > 0) {
+				stack[s++] = high + 1;
+				stack[s++] = right;
+			}
+		}
+	}
+	return;
+}
+int main() {
+	int arr[6] = { 11,47,32,23,14,90 };
+	quicksort(arr, 0, 5);
+	for (int i = 0; i < 6; i++)
+		cout << arr[i] << " ";
+	return 0;
+}
