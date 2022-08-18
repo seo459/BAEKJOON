@@ -19,7 +19,7 @@ void quicksort(int* arr, int left, int right)
 		{
 			while (low < right && arr[low] <= arr[pivot])
 				low++;
-			while (high > left && arr[high] >= arr[pivot]) //attention boundary condition
+			while (high >= low && arr[high] >= arr[pivot]) //attention boundary condition
 				high--;
 			if (low < high) {
 				int tmp = arr[low];
