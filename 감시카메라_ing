@@ -1,0 +1,219 @@
+#include <iostream> //5884번
+#include <cmath>
+#include <algorithm>
+#include <vector>
+#define K 3 //K is segment amount
+using namespace std;
+int N;
+int stack[3000];
+bool searching_ending(int det, int x)
+{
+	int tmp = pow(2, x) - 1;
+	if (det == tmp)
+		return true;
+	else return false;
+	//for ending condition satisfy.
+}
+void set_up_det(int& det, int x)
+{
+	det = 0;
+	while (x)
+	{
+		det += pow(2, x - 1);
+		x--;
+	}
+	//ex) x=3 -> 000-> 100 -> 110 -> 111 <-- 'set up' clear!
+}
+void swap(int** arr, int idx_1, int idx_2, char ch = 'a')
+{
+	if (ch == 'a') {
+		int tmp_x = arr[idx_1][0], tmp_y = arr[idx_1][1];
+		arr[idx_1][0] = arr[idx_2][0]; arr[idx_1][1] = arr[idx_2][1];
+		arr[idx_2][0] = tmp_x; arr[idx_2][1] = tmp_y;
+	}
+	else if (ch == 'x') {
+		int tmp_x = arr[idx_1][0];
+		arr[idx_1][0] = arr[idx_2][0];
+		arr[idx_2][0] = tmp_x;
+	}
+	else if (ch == 'y') {
+		int tmp_y = arr[idx_1][1];
+		arr[idx_1][1] = arr[idx_2][1];
+		arr[idx_2][1] = tmp_y;
+	}
+}
+void quicksort(int** arr, int left, int right, char ch ='x')
+{
+	int s = 0;
+	stack[s++] = left;
+	stack[s++] = right;
+
+	while (s > 0)
+	{
+		right = stack[--s];
+		left = stack[--s];
+		int low = left + 1; int high = right;
+		if (left >= right) continue;
+		int pivot = left;
+		while (true)
+		{
+			if (ch == 'x') {
+				while (low < right && arr[low][0] <= arr[pivot][0])
+					low++;
+				while (high >= low && arr[high][0] >= arr[pivot][0]) //attention boundary condition
+					high--;
+			}
+			else if (ch == 'y') {
+				while (low < right && arr[low][1] <= arr[pivot][1])
+					low++;
+				while (high >= low && arr[high][1] >= arr[pivot][1]) //attention boundary condition
+					high--;
+			}
+			if (low < high) {
+				swap(arr, low, high);
+			}
+			else if (low >= high) {
+				swap(arr, pivot, high);
+				break;
+			}
+		}
+		stack[s++] = left;
+		stack[s++] = high - 1;
+		stack[s++] = high + 1;
+		stack[s++] = right;
+	}
+	return;
+}
+void align(int** arr)
+{
+	//first state receive arranged array (based on 'x')
+	int cnt = 0; int start, end;
+	int compared_tmp = -9999;
+	for (int i = 0; i < N; i++)
+	{
+		if (cnt == 0 && arr[i][0] != compared_tmp)
+		{
+			start = i;
+			cnt++;
+		}
+		else if (cnt == 1 && arr[i][0] != compared_tmp)
+		{
+			cnt = 0;
+			end = i-1;
+			quicksort(arr, start, end, 'y');
+		}
+		compared_tmp = arr[i][0];
+	}
+}
+int combine_NOE(vector <int>& vec_x,vector <int>& vec_y, vector <int>&vec)
+{
+	int count = 0;
+	auto vec_x_end = vec_x.end(), vec_y_end = vec_y.end();
+	for (auto it = vec_x.begin(); it != vec_x_end; it++)
+	{
+		vec.push_back(*it);
+		count++;
+	}
+	for (auto it = vec_y.begin(); it != vec_y_end; it++)
+		vec.push_back(*it);
+	return count; // count means x_line_element amount
+}
+int vec_set_and_pec_amount(int** arr)
+{
+	int pec = 0;
+	quicksort(arr,0,N,'x');
+	vector <pair<int,int>> vec;
+	int compared_tmp = -9999;
+	for (int i = 0; i < N-1; i++)
+	{
+		if (arr[i][0] != compared_tmp && arr[i+1][0] != arr[i][0]) {
+			compared_tmp = arr[i][0];
+			int find_num = arr[i][1];
+			int cnt = 0;
+			for (int p = i + 1; p < N; p++)
+			{
+				if (arr[p][1] == find_num) {
+					cnt++;
+					break;
+				}
+			}
+			for (int q = i - 1; q >= 0; q--)
+			{
+				if (arr[q][1] == find_num) {
+					cnt++;
+					break;
+				}
+			}
+			if (cnt == 0) {
+				vec.push_back(make_pair(arr[i][0], arr[i][1]));
+				pec++;
+				//elements are peculiar point
+			}
+			
+		}
+	}
+
+	
+}
+bool func(int** arr)
+{ 
+	vector <int> vec, vec_x, vec_y;
+	int peculiar_amount = vec_set_and_pec_amount(arr);
+	int det; int x = K - peculiar_amount; //x is thred amount
+	set_up_det(det, x);
+	
+	for (int i = 0; ; i++)
+	{
+		//bit masking
+		if (det & (1 << i)) //det means 'detecter'
+		{
+			if (1 & det) // for example 000001 & 101101 = 000001(2) -> 1(true)
+			{
+				int k = 1;  //(ex) 10011(2) -> k=2 , 10101(2) -> k=1
+				while (det & (1 << (k - 1))) k++; // right side '1' amount = k
+				if (k == x) //ending condition. for example 000111(2) -> x==3==k (final state) 
+				{
+					if (function()) //for using this state
+						count++;
+					break;
+				}
+				int next_moving_idx;
+				for (int i = 1; ; i++)
+					if (det & (1 << (k + i)))
+					{
+						next_moving_idx = k + i;
+						break;
+					}
+
+				det = (int)(det / pow(2, (next_moving_idx - 1))) * (next_moving_idx - 1); // right clear , using quotient
+				for (int i = 0; i < k; i++)
+					det = det + pow(2, next_moving_idx - 1 - i); // for attach, '1' amount of right 
+				//using phase
+			}
+			else
+			{
+				//basic state (ex) 11010(2) -> 11001(2)
+				det &= (~(1 << i));//moving phase 1. (erasing)
+				det |= (1 << (i - 1)); //moving phase 2. (inserting)
+				//using phase
+				if (function())
+					count++;
+				i = 0; continue;
+			}
+		}
+	}
+}
+
+int main()
+{
+	cin >> N;
+	int** arr = new int* [N];
+	for (int i = 0; i < N; i++)
+		arr[i] = new int[2];
+	//N*2 dynamic allocation
+	for (int i = 0; i < N; i++)
+	{
+		cin >> arr[i][0] >> arr[i][1];
+	}	
+
+}
