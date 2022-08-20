@@ -1,0 +1,51 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+string str[10000];
+
+bool opposite_word(string st)
+{
+	int len = st.length();
+	bool* verified = new bool[len];
+	for (int i = 0; i < len; i++) verified[i] = false;
+
+	for (int i = 0; i < len - 1; i++)
+	{
+		if (st[i] > 122 || st[i] <97)
+			continue;
+		for (int j = i + 1; j < len; j++)
+			if (verified[j]==false && st[i] + st[j] == 219)
+			{
+				verified[i] = true;
+				verified[j] = true;
+				break;
+			}
+	}
+	for (int i = 0; i < len; i++)
+	{
+		if (verified[i] == false && st[i] >=97 && st[i] <=122)
+			return false;
+	}
+	return true;
+}
+
+int main()
+{
+	int N;
+	cin >> N;
+	for (int i = 0; i < N; i++) {
+		cin >> str[i];
+		int length = str[i].length();
+		for (int j = 0; j < length; j++)
+			if (str[i][j] <= 90 && str[i][j] >= 65)
+				str[i][j] = str[i][j] + 32; //kill Capital
+	}
+	for (int i = 0; i < N; i++) {
+		if (opposite_word(str[i]))
+			cout << "Yes" << "\n";
+		else
+			cout << "No" << "\n";
+	}
+	return 0;
+}
