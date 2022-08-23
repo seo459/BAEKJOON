@@ -20,7 +20,7 @@ void fun(const int depth)
 			tmp_v.push_back(idx);
 			func(tmp_v);
 		}
-		visited[idx] = false; // before visited place T->F. if index go to threshold, second best index T->F
+		visited[idx] = false; // before visited place T->F. if index encounter threshold, second best index T->F
 		for (int i = idx + 1; i < N; i++)
 		{
 			if (cnt < depth) 
