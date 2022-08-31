@@ -1,6 +1,5 @@
 #include <iostream>
 #include <deque>
-#include <vector>
 #include <queue>
 using namespace std;
 priority_queue <int> ans_vec;
@@ -12,31 +11,35 @@ void state_record(const bool* selected)
 {
 	int tmp_ans = 0;
 	while (!ans_vec.empty())
-		ans_vec.pop(); //clear
-	
+		ans_vec.pop(); //clear	
+
 	for (int i = 0; i < N; i++)
 		if (selected[i] == true)
 		{
 			tmp_ans++;
-			ans_vec.push(i);
+			ans_vec.push(-i);
 		}
-	if (tmp_ans > ans) ans = tmp_ans; // renew answer
+	if (tmp_ans > ans)
+		ans = tmp_ans; // renew answer
+	
 }
 
-bool state_check(const bool* selected)
+bool state_check(const bool* selected) //wrong
 {
 	int* choiced = new int[N] {}; //set '0' all elements
 	for (int i = 0; i < N; i++)
 	{
 		if (selected[i] == true) 
 		{
-			choiced[giftList_Q[selected[i]].first]++;
-			choiced[giftList_Q[selected[i]].second]++;
+			int cur_person_like_1 = giftList_Q[i].first;
+			int cur_person_like_2 = giftList_Q[i].second;
+			choiced[cur_person_like_1]++;
+			choiced[cur_person_like_2]++;
 		}
 	}
 	for (int i=0; i<N; i++)
 	{
-		if (selected[i] == true && choiced[i] != 2) //bcs participant must be voted '2'
+		if ((selected[i] == true) && (choiced[i] != 2)) //bcs participant must be voted '2'
 		{
 			delete [] choiced;
 			return false;
@@ -46,54 +49,55 @@ bool state_check(const bool* selected)
 	return true;
 }
 
-int func(int start_person)
+void func(int start_person)
 {
 	int cur_depth = 0;
 	bool* selected = new bool [N] {false};
 	deque <pair<int, int>> candidate_Q;
 	vector <int> selected_idx;
-	selected[start_person] = true;
-	selected_idx.push_back(start_person);
 	candidate_Q.push_front(make_pair(start_person,cur_depth));
-	
+
 	while (!candidate_Q.empty())
 	{
-		if (candidate_Q.size() <= 0) break; //boundary safety, preventing RUNTIME ERROR
-		
-		if (selected[candidate_Q.front().first] == false && cur_depth == candidate_Q.front().second) 
-		{
-			selected[candidate_Q.front().first] = true; // particiated person recording
-			selected_idx.push_back(candidate_Q.front().first);
-			if (state_check(selected))
-			{
-				state_record(selected);
-			}
-			int like_1 = giftList_Q[candidate_Q.front().first].first; //'person have possibility' pushing
-			int like_2 = giftList_Q[candidate_Q.front().first].second;
-			cur_depth++;
-			candidate_Q.pop_front();
-			candidate_Q.push_front(make_pair(like_1,++cur_depth));
-			candidate_Q.push_front(make_pair(like_2,cur_depth));  //FIFO
+		int cur_person = candidate_Q.front().first;
+		cur_depth = candidate_Q.front().second;
+		selected[cur_person] = true;
+		selected_idx.push_back(cur_person);
+		candidate_Q.pop_front();
+		int cur_person_like_1 = giftList_Q[cur_person].first;
+		int cur_person_like_2 = giftList_Q[cur_person].second;
+		if (state_check(selected))
+			state_record(selected);
 
-		}
-
-		else if (selected[candidate_Q.front().first] == true && cur_depth == candidate_Q.front().second) 
+		if (selected[cur_person_like_1] == false && selected[cur_person_like_2] == false)
 		{
-			candidate_Q.pop_front();
+			candidate_Q.push_front(make_pair(cur_person_like_1, ++cur_depth));
+			candidate_Q.push_front(make_pair(cur_person_like_2, cur_depth));
 		}
-		
-		else if (selected[candidate_Q.front().first] == true && cur_depth < candidate_Q.front().second) 
+		else if (selected[cur_person_like_1] == false && selected[cur_person_like_2] == true)
+			candidate_Q.push_front(make_pair(cur_person_like_1, ++cur_depth));
+		else if (selected[cur_person_like_1] == true && selected[cur_person_like_2] == false)
+			candidate_Q.push_front(make_pair(cur_person_like_2, ++cur_depth));
+		else if (selected[cur_person_like_1] == true && selected[cur_person_like_2] == true && !candidate_Q.empty())
 		{
-			int depth_gap = candidate_Q.front().second - cur_depth;
-			for (int i = 0; i < depth_gap + 1; i++)
-			{
+			int next_depth = candidate_Q.front().second;
+			int depth_gap = cur_depth - next_depth;
+			if (depth_gap == 0) {
 				selected[selected_idx.back()] = false;
 				selected_idx.pop_back();
 			}
-		} // backing
+			else if(depth_gap > 0) {
+				for (int i = 0; i < depth_gap + 1; i++)
+				{
+					selected[selected_idx.back()] = false;
+					selected_idx.pop_back();
+				}
+			}
+		}//not deeper than now, go up or beside(backing point)
+		
 	}
 	delete[] selected;
-	return 0;
+	return ;
 }
 
 void setting(int& N)
@@ -103,16 +107,25 @@ void setting(int& N)
 	{
 		int a, b;
 		cin >> a >> b;
-		giftList_Q.push_back(make_pair(a, b));
+		giftList_Q.push_back(make_pair(a-1, b-1));
 	}
 	return;
 }
 
 int main()
 {
+	cin.tie(NULL);
+	ios::sync_with_stdio(false);
 	setting(N);
 	for (int i = 0; i < N; i++)
 		func(i);
+
+	cout << ans <<'\n';
+	while (!ans_vec.empty())
+	{
+		cout << -ans_vec.top() + 1 << " ";
+		ans_vec.pop();
+	}
 
 	return 0;
 }
