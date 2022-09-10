@@ -1,0 +1,84 @@
+#include <iostream>
+#include <deque>
+using namespace std;
+
+int N, M;
+deque <int> visited;
+
+void initial_set()
+{
+	for (int i = 1; i <=M; i++)
+		visited.push_back(i);
+}
+void print_combination()
+{
+	auto visited_end = visited.end();
+	for (auto it = visited.begin(); it != visited_end; it++)
+	{
+		cout << *it << " ";
+	}
+	cout << "\n";
+}
+bool state_continue()
+{
+	int tmp = N - M + 1;
+	for (int k = 0; k < M; k++)
+	{
+		if (visited[k] != tmp)
+			return true;
+		tmp++;
+	}
+	return false;
+}
+int rear_amount()
+{
+	int s = 0;
+	int tmp = visited.size() - 1;
+	for (int it = tmp; it >= 0; it--)
+	{
+		if (visited[it] == N - s) 
+			s++;
+		else 
+			break;
+	}
+	return s;
+}
+void renew_visited(int rear_1)
+{
+	for (int i = 0; i < rear_1; i++)
+		visited.pop_back();
+	int attach_point = visited.back() + 1; //popped '1' before implementation. so 'visited.back()+1' value is attach_point
+	visited.pop_back();
+	for (int i = 0; i <= rear_1; i++)
+		visited.push_back(i + attach_point);
+}
+void combination()
+{
+	initial_set();
+	int cur = M;
+	while (true)
+	{
+		if (cur == N)
+		{
+			if (state_continue() == false) break;
+			int rear_1 = rear_amount();
+			renew_visited(rear_1);
+			cur = visited.back();
+		}
+		else 
+		{
+			print_combination();
+			visited.pop_back();
+			visited.push_back(++cur);
+		}
+	}
+	
+}
+
+int main()
+{
+	cin >> N >> M;
+	N++;
+	combination();
+	return 0;
+}
