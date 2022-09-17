@@ -22,7 +22,11 @@ int main()
 		}
 		if (cnt >= (int)(N / 2) + 1)
 		{
-			cout << gcd;
+			cout << gcd << "\n";
+			for(auto it = vec.begin(); it != vec.end(); it++)
+			{
+				cout << arr[*it] << "\n";			
+			}
 			break;
 		}
 	}
