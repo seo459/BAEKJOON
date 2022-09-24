@@ -1,0 +1,36 @@
+#include <iostream>
+#include <deque>
+#define MAX 100000
+using namespace std;
+int* coin;
+int* ans;
+
+int main()
+{
+	int N, K;
+	cin >> N >> K;
+	coin = new int[N];
+	ans = new int[K + 1];
+	for (int i = 0; i <= K; i++)
+		ans[i] = MAX;
+	for (int i = 0; i < N; i++)
+	{
+		cin >> coin[i]; //무슨 동전인지 결정한다.
+		if(coin[i] <= K)
+			ans[coin[i]] = 1;
+	}
+	for (int val = 1; val <= K; val++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			if ((val - coin[j] > 0) && (ans[val] > ans[val - coin[j]] + 1)) {
+				ans[val] = ans[val - coin[j]] + 1;
+			}
+		}
+	}
+	if (ans[K] != MAX)
+		cout << ans[K];
+	else
+		cout << -1;
+	return 0;
+}
