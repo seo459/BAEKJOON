@@ -1,39 +1,38 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+using namespace std;
+int L = 0, Time = 0;
+int Apple_amout = 0;
+vector <pair<int, int>> Tail_vec;
+deque <pair<pair<int, int>, pair<int, int>>> Q;
+pair <int, int> finish_node;
 //snack move to goal place, He can reaching to goal?
 // can't go through Tail region, If snack eat Apple, Tail_region reset.
 //-1 : blocking_region , 0 : empty_region , 2 : apple_region , 1 : Tail_region
-using namespace std;
-int Apple_amout = 0;
-
-vector <pair<int, int>> Tail_vec;
-deque <pair<pair<int,int>, pair<int, int>>> Q;
-pair <int, int> finish_node;
-
-int main()
-{
-	int N, L, turned = 0, time = 0; // L means restricted turn
-	char Head_direction = 'R';
-	int** arr = new int* [N];
-	for (int i = 0; i < N; i++)
-		arr[i] = new int[N];
-	
-	finish_node = make_pair(N, N);
-	
-
-}
-bool finish_condition(int **arr, deque <pair<pair<int, int>, pair<int, int>>> &Q)
+bool finish_condition(int** arr, deque <pair<pair<int, int>, pair<int, int>>>& Q)
 {
 	if (Q.empty() == true || make_pair(Q.front().second.first, Q.front().second.second) == finish_node)
 		return true;
 	else return false;
 }
-void consume_node(int** arr,int &turned ,int &time ,vector <pair<int, int>>& Tail_vec)
+int main()
+{
+	int N, turned = 0; // L means restricted turn
+	char Head_direction = 'R';
+	int** arr = new int* [N];
+	for (int i = 0; i < N; i++)
+		arr[i] = new int[N];
+
+	finish_node = make_pair(N, N);
+
+}
+
+void consume_node(int** arr,int &turned)
 {
 	int x = Q.front().second.first;
 	int y = Q.front().second.second;
-	time = Q.front().first.first;
+	Time = Q.front().first.first;
 	turned = Q.front().first.second;
 	Q.pop_front();
 
@@ -53,66 +52,71 @@ void consume_node(int** arr,int &turned ,int &time ,vector <pair<int, int>>& Tai
 		Tail_vec.push_back(make_pair(x, y));
 	} // Tail node val = 1
 }
-void pushing_node(int** arr, int &time, int L, int& turned,char Head_direction = 'R')
+void pushing_node(int** arr, int& turned,char Head_direction = 'R')
 {
 	int x = Q.front().second.first;
 	int y = Q.front().second.second;
+	int North_val = arr[x][y + 1];
+	int South_val = arr[x][y - 1];
+	int Right_val = arr[x + 1][y];
+	int Left_val = arr[x - 1][y];
+
 	//present node information is pair(x,y)
 	if (Head_direction == 'R' && turned < L)
 	{
-		if (arr[x + 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x + 1, y)));
-		if (arr[x][y + 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x, y + 1)));
-		if (arr[x][y - 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x, y - 1)));
+		if (Right_val == 0 || Right_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned), make_pair(x + 1, y)));
+		if (North_val == 0 || North_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned + 1), make_pair(x, y + 1)));
+		if (South_val == 0 || South_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned + 1), make_pair(x, y - 1)));
 	}
 	else if (Head_direction == 'R' && turned == L)
 	{
-		if (arr[x + 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x + 1, y)));
+		if (Right_val == 0 || Right_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned), make_pair(x + 1, y)));
 	}
 	else if (Head_direction == 'S' && turned < L)
 	{
-		if (arr[x + 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x + 1, y)));
-		if (arr[x - 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x - 1, y)));
-		if (arr[x][y - 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x, y - 1)));
+		if (Right_val == 0 || Right_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned + 1), make_pair(x + 1, y)));
+		if (Left_val == 0 || Left_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned + 1), make_pair(x - 1, y)));
+		if (South_val == 0 || South_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned), make_pair(x, y - 1)));
 	}
 	else if (Head_direction == 'S' && turned == L)
 	{
-		if (arr[x][y - 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x, y - 1)));
+		if (South_val == 0 || South_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned), make_pair(x, y - 1)));
 	}
 	else if (Head_direction == 'L' && turned < L)
 	{
-		if (arr[x -1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x - 1, y)));
-		if (arr[x][y + 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x, y + 1)));
-		if (arr[x][y - 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x, y - 1)));
+		if (Left_val == 0 || Left_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned), make_pair(x - 1, y)));
+		if (North_val == 0 || North_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned + 1), make_pair(x, y + 1)));
+		if (South_val == 0 || South_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned + 1), make_pair(x, y - 1)));
 	}
 	else if (Head_direction == 'L' && turned == L)
 	{
-		if (arr[x - 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x - 1, y)));
+		if (Left_val == 0 || Left_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned), make_pair(x - 1, y)));
 	}
 	else if (Head_direction == 'N' && turned < L)
 	{
-		if (arr[x + 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x + 1, y)));
-		if (arr[x - 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x - 1, y)));
-		if (arr[x][y + 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x, y - 1)));
+		if (Right_val == 0 || Right_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned + 1), make_pair(x + 1, y)));
+		if (arr[x - 1][y] == 0 || arr[x + 1][y] == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned + 1), make_pair(x - 1, y)));
+		if (North_val == 0 || North_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned), make_pair(x, y - 1)));
 	}
 	else if (Head_direction == 'N' && turned == L)
 	{
-		if (arr[x][y + 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x, y + 1)));
+		if (North_val == 0 || North_val == 2)
+			Q.push_front(make_pair(make_pair(Time + 1, turned), make_pair(x, y + 1)));
 			
 	}
 }
