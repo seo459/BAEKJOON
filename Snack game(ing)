@@ -13,7 +13,7 @@ pair <int, int> finish_node;
 
 int main()
 {
-	int N, L, turned = 0; // L means restricted turn
+	int N, L, turned = 0, time = 0; // L means restricted turn
 	char Head_direction = 'R';
 	int** arr = new int* [N];
 	for (int i = 0; i < N; i++)
@@ -29,11 +29,14 @@ bool finish_condition(int **arr, deque <pair<pair<int, int>, pair<int, int>>> &Q
 		return true;
 	else return false;
 }
-void consume_node(int** arr, vector <pair<int, int>>& Tail_vec)
+void consume_node(int** arr,int &turned ,int &time ,vector <pair<int, int>>& Tail_vec)
 {
 	int x = Q.front().second.first;
 	int y = Q.front().second.second;
+	time = Q.front().first.first;
+	turned = Q.front().first.second;
 	Q.pop_front();
+
 	if (arr[x][y] == 0)
 	{
 		Tail_vec.push_back(make_pair(x, y));
@@ -50,7 +53,7 @@ void consume_node(int** arr, vector <pair<int, int>>& Tail_vec)
 		Tail_vec.push_back(make_pair(x, y));
 	} // Tail node val = 1
 }
-void pushing_node(int** arr, int time, int L, int& turned,char Head_direction = 'R')
+void pushing_node(int** arr, int &time, int L, int& turned,char Head_direction = 'R')
 {
 	int x = Q.front().second.first;
 	int y = Q.front().second.second;
@@ -58,11 +61,11 @@ void pushing_node(int** arr, int time, int L, int& turned,char Head_direction = 
 	if (Head_direction == 'R' && turned < L)
 	{
 		if (arr[x + 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1,turned), make_pair(x + 1, y)));
+			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x + 1, y)));
 		if (arr[x][y + 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, ++turned), make_pair(x, y + 1)));
+			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x, y + 1)));
 		if (arr[x][y - 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, ++turned), make_pair(x, y - 1)));
+			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x, y - 1)));
 	}
 	else if (Head_direction == 'R' && turned == L)
 	{
@@ -72,9 +75,9 @@ void pushing_node(int** arr, int time, int L, int& turned,char Head_direction = 
 	else if (Head_direction == 'S' && turned < L)
 	{
 		if (arr[x + 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, ++turned), make_pair(x + 1, y)));
+			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x + 1, y)));
 		if (arr[x - 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, ++turned), make_pair(x - 1, y)));
+			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x - 1, y)));
 		if (arr[x][y - 1] == 0 || 2)
 			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x, y - 1)));
 	}
@@ -88,9 +91,9 @@ void pushing_node(int** arr, int time, int L, int& turned,char Head_direction = 
 		if (arr[x -1][y] == 0 || 2)
 			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x - 1, y)));
 		if (arr[x][y + 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, ++turned), make_pair(x, y + 1)));
+			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x, y + 1)));
 		if (arr[x][y - 1] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, ++turned), make_pair(x, y - 1)));
+			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x, y - 1)));
 	}
 	else if (Head_direction == 'L' && turned == L)
 	{
@@ -100,9 +103,9 @@ void pushing_node(int** arr, int time, int L, int& turned,char Head_direction = 
 	else if (Head_direction == 'N' && turned < L)
 	{
 		if (arr[x + 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, ++turned), make_pair(x + 1, y)));
+			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x + 1, y)));
 		if (arr[x - 1][y] == 0 || 2)
-			Q.push_front(make_pair(make_pair(time + 1, ++turned), make_pair(x - 1, y)));
+			Q.push_front(make_pair(make_pair(time + 1, turned + 1), make_pair(x - 1, y)));
 		if (arr[x][y + 1] == 0 || 2)
 			Q.push_front(make_pair(make_pair(time + 1, turned), make_pair(x, y - 1)));
 	}
