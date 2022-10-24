@@ -50,6 +50,7 @@ void consume_node(int** arr,int &turned)
 			Tail_vec.pop_back();
 		}
 		Tail_vec.push_back(make_pair(x, y));
+		arr[x][y] = 1;
 	} // Tail node val = 1
 }
 void pushing_node(int** arr, int& turned,char Head_direction = 'R')
