@@ -1,0 +1,147 @@
+#include <iostream>
+using namespace std;
+#define ERROR_VAL -9999
+class Node {
+public:
+	int data;
+	Node* next;
+	Node* prev;
+	int setData(int const& val) { data = val; }
+	Node(int data=0) { prev = NULL; next = NULL; this->data = data; }
+	Node* getNext() { return next; }
+	Node* getPrev() { return prev; }
+	int getData() { return data; }
+	Node* setNext(Node* p) { next = p; }
+	Node* setPrev(Node* p) { prev = p; }
+};
+
+class Linked_list {
+public:
+	Node  org;
+	Node* tail;
+	Linked_list() { org.data = 0; }
+	Node* getEntry(int pos);
+	void push_front(int data);
+	void push_back(int data);
+	void pop_front();
+	void pop_back();
+	int rear() {
+		if (org.getNext() == NULL) return ERROR_VAL;
+		for (Node* it = org.getNext(); ; it = it->getNext())
+			if (it->getNext() == NULL) // it 의 주소가 tail에 도착함.
+				return (tail->getData());
+	}
+	int front() {
+		if (org.getNext() == NULL) return ERROR_VAL;
+		return (org.getNext())->getData();
+	}
+	void show();
+	bool isEmpty() { 
+		if (org.getNext() == NULL) return true;
+		else return false;
+	}
+	void remove(int pos);
+	void insert(int pos,Node* tmp);
+	void display();
+};
+Node* Linked_list::getEntry(int pos) {
+	Node* tmp = &org;
+	for (int i = -1; i < pos; i++)
+	{
+		tmp = tmp->getNext();
+		if (tmp == NULL) {
+			//pos번째 원소가 존재하지 않음
+		}
+	}
+	return tmp;
+}
+void Linked_list::remove(int pos) {
+	Node* tmp = &org;
+	for (int i = -1; i < pos; i++)
+	{
+		tmp = tmp->getNext();
+		if (tmp == NULL) return; //pos에 해당하는 원소가 존재하지 않음
+	}
+	//tmp 이전 노드(before_node) -> tmp 노드 -> tmp 다음 노드(after_node)
+	Node* before_node = tmp->getPrev();
+	Node* after_node = tmp->getNext();
+	delete tmp;
+
+	before_node->setNext(after_node);
+	after_node->setPrev(before_node);
+}
+void Linked_list::push_front(int data) {
+	Node* first_node = new Node;
+	Node* second_node = org.getNext();
+	if (org.getNext() == NULL) {
+		this->tail = first_node;
+	}
+	else {
+		org.setNext(first_node);
+		first_node->setNext(second_node);
+		first_node->setPrev(&org);
+		second_node->setPrev(first_node);
+	}
+}
+void Linked_list::push_back(int data) {
+	Node* tmp = new Node;
+	tmp->setData(data);
+	tmp->setPrev(tail);
+	tail->setNext(tmp);
+	tail = tmp;
+}
+void Linked_list::pop_back() {
+	if (org.getNext() == NULL) {
+
+	}
+	else {
+
+	}
+}
+void Linked_list::pop_front() {
+	if (org.getNext() == NULL) {
+
+	}
+	else {
+
+	}
+}
+void Linked_list::insert(int pos, Node *tmp) // 기존1 - new_node - 기존2 (p)
+{
+	Node* n = &org;
+	for (int i = -1; i < pos; i++, n = n->getNext())
+	{
+		if (n == NULL) break;
+		else { 
+			// tmp 이전 노드 -> tmp 노드 -> n 노드
+			Node* prev_tmp = n->getPrev();
+			Node* Next_tmp = n;
+
+			// -> 방향 링크지정
+			prev_tmp->setNext(tmp); 
+			tmp->setNext(Next_tmp);
+
+			// <- 방향 링크지정
+			n->setPrev(tmp);  
+			tmp->setPrev(prev_tmp);
+
+		}
+	}
+}
+void Linked_list::remove(int pos) {
+	Node* n = &org;
+	for (int i = -1; i < pos; i++, n = n->getNext())
+		if (n == NULL) return;
+	// n 이전 노드 -> n 노드 -> n 다음 노드
+	Node* prev_node = n;
+	Node* Next_node = n->getNext();
+	//n 노드 삭제 후 이전노드와 다음노드를 이어준다.
+	prev_node->setNext(Next_node);
+	Next_node->setPrev(prev_node);
+	
+}
+void Linked_list::display() {
+	if (org.getNext() == NULL) return;
+	for (Node* it = org.getNext(); it != NULL; it = it->getNext())
+		printf("%d ", it->getData());
+}
