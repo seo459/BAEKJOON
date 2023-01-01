@@ -1,0 +1,80 @@
+
+class BinaryNode {
+protected:
+	int val;
+	BinaryNode* parent;
+	BinaryNode* left;
+	BinaryNode* right;
+public:
+	BinaryNode(int val = 0) { parent = left = right = NULL; this->val = val; }
+	BinaryNode* getParent() { return parent; }
+	BinaryNode* getLeft() { return left; }
+	BinaryNode* getRight() { return right; }
+	void setLeft(BinaryNode* n = NULL) { left = n; }
+	void setRight(BinaryNode* n = NULL) { right = n; }
+	void setParent(BinaryNode* n = NULL) { parent = n; }
+	int getVal() { return this->val; }
+	void setVal(int val) { this->val = val; }
+};
+class Heap : public BinaryNode {
+private:
+	BinaryNode* root;
+public:
+	BinaryNode* getRoot() { return root; }
+	BinaryNode* remove(BinaryNode* parent, BinaryNode* n);
+	void remove(int data) {
+		BinaryNode* p = root;
+		BinaryNode* parent = root;
+		while (p != NULL) {
+			parent = p;
+			if (p->getVal() == data) {
+				remove(parent, p);
+				return;
+			}
+			if (p->getLeft()->getVal() > data) {
+				parent = p;
+				p = p->getLeft();
+			}
+			else { // p->getRight()->getVal() < data 인 경우
+				parent = p;
+				p = p->getRight();
+			}
+		}
+		return;
+
+	}
+};
+BinaryNode* Heap::remove(BinaryNode* parent, BinaryNode* n)
+{
+	if (n->getLeft() == NULL && n->getRight() == NULL) {
+		parent->setLeft(NULL); parent->setRight(NULL);
+	}
+	else if (n->getLeft() == NULL && n->getRight() != NULL) {
+		if (parent->getRight() == n)
+			parent->setRight(n->getRight());
+		else // parnet의 왼쪽에 n을 보유하고 있는 경우
+			parent->setLeft(n->getRight());
+	}
+	else if (n->getLeft() != NULL && n->getRight() == NULL) {
+		if (parent->getRight() == n)
+			parent->setRight(n->getLeft());
+		else // parnet의 왼쪽에 n을 보유하고 있는 경우
+			parent->setLeft(n->getLeft());
+	}
+	else { //n이 두개의 child를 갖고 있는 경우
+		BinaryNode* succp = n;
+		BinaryNode* succ = n->getRight();
+		while (succ->getLeft() != NULL) {
+			succp = succ;
+			succ = succ->getLeft();
+		}
+
+		if (succp->getLeft() == succ) // 정상적 동작
+			succp->setLeft(succ->getRight());
+		else                          //비정상적 동작
+			succp->setRight(succ->getRight());
+		n->setVal(succ->getVal());
+		n = succ;
+	}
+	delete n;
+}
