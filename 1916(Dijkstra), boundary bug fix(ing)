@@ -1,0 +1,154 @@
+#include <iostream>
+#include <queue>
+#define inf 100000
+using namespace std;
+
+class Compare
+{
+public:
+	bool operator()(pair<int, int> a, pair<int, int> b) {
+		return a.first > b.first;
+	}
+};
+
+class D_Node {
+public:
+	int cost;
+	int current;
+	int destination;
+	D_Node* link = nullptr;
+	D_Node(int current = -1, int destination = -1, int cost = 0) {
+		this->cost = cost; this->destination = destination; this->current = current;
+	}
+	void setDestination(int destination) { this->destination = destination; }
+	void setCost(int cost) { this->cost = cost; }
+	void setCurrent(int current) { this->current = current; }
+	void setLink(D_Node* link) { (this->link) = link; }
+	int getDestination() const { return destination; }
+	int getCost() const { return cost; }
+	int getCurrent() const { return current; }
+	D_Node* getLink() { return link; }
+	bool operator==(const D_Node* rhs) const {
+		if ((this->cost == rhs->cost) &&
+			(this->destination == rhs->destination) &&
+			(this->current == rhs->current)) return true;
+		return false;
+	}
+};
+
+class linked_list : public D_Node { //list는 adjecent 역할을 수행한다.
+private:
+	D_Node* Tail;
+	D_Node* Head;
+	int cnt = 0;
+public:
+	void push(int start, int end, int toll) {
+		if (cnt == 0) {
+			Tail = new D_Node(start, end, toll);
+			Head = Tail;
+			cnt++;
+			return;
+		}
+		D_Node* new_node = new D_Node;
+		Tail->setLink(new_node);
+
+		new_node->setCost(toll);
+		new_node->setCurrent(start);
+		new_node->setDestination(end);
+		Tail = new_node;  cnt++;
+	}
+	D_Node* getTail() { return Tail; }
+	D_Node* getRoot() { return Head; }
+	bool isEmpty() {
+		if (cnt == 0) return true;
+		return false;
+	}
+	int getCnt() { return cnt; }
+};
+
+priority_queue <pair<int, int>, vector<pair<int, int>>, Compare> pq;// (비용, 다음정점)
+linked_list *list;
+int* Table;
+
+void renewTable(int N, int A)
+{
+	while (!pq.empty())
+	{
+		int total_cost = pq.top().first; int cur = pq.top().second;
+		pq.pop();
+
+		int cnt = 0;
+		// adj가 없으면 지나간다.
+		if (!list[cur].isEmpty())
+		for (D_Node* it = list[cur].getRoot(); ; )
+		{
+			cnt++;
+			if ((it->getCost()) + total_cost 
+				< Table[it->getDestination()]) //include possible way only!
+			{
+				int arrived = it->getDestination();
+				int costed = it->getCost() + total_cost;
+				Table[arrived] = it->getCost() + total_cost;
+				//impledmented behavior : if(possible,reasonable route) -> renew Table value
+				//after Table update, have to pushing reasonable value to pq(Priority Queue) at updated place
+				int cnt_2 = 0;
+				if (!list[arrived].isEmpty())
+				for (D_Node* at = list[arrived].getRoot();;) //adjecent way searching , and find that new reasonable route
+				{
+					cnt_2++;
+					if (at->getCost() + costed < Table[at->getDestination()])
+						pq.push(make_pair(at->getCost() + costed
+							             ,at->getDestination()));
+
+					if (list[arrived].getCnt() == cnt_2)
+						break;
+					at = at->getLink();
+				}
+					
+			}
+			if (list[cur].getCnt() == cnt)
+				break;
+			it = it->getLink();
+		}
+	}
+}
+
+void setting(int& N, int& M, int& A, int& B)
+{
+	cin >> N >> M; // N개의 vertex, M개의 way(간선)
+	list = new linked_list[N + 1];
+	Table = new int[N + 1];
+
+	for (int i = 0; i < M; i++) { // M개의 간선(way) Input
+		int a, b, c;
+		cin >> a >> b >> c;
+		list[a].push(a, b, c);
+	}
+
+	for (int i = 1; i <= N; i++) Table[i] = inf;
+	cin >> A >> B; // A에서 출발(begin) B에 도착(ending)
+	Table[A] = 0;
+
+	//pq initial setting
+	if (!list[A].isEmpty()) {
+		int cnt = 0;
+		for (D_Node* it = list[A].getRoot(); ;)
+		{
+			cnt++;
+			pq.push(make_pair(it->getCost(), it->getDestination()));
+			Table[it->getDestination()] = it->getCost();
+			if (list[A].getCnt() == cnt)
+				break;
+			it = it->getLink();
+		}
+	}
+}
+
+int main()
+{
+	int N, M, A, B; 
+	setting(N, M, A, B);
+	renewTable(N, A);
+	cout << Table[B];
+	return 0;
+}
