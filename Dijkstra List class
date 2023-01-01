@@ -1,0 +1,66 @@
+
+class Compare
+{
+public:
+	bool operator()(pair<int, int> a, pair<int, int> b) {
+		return a.first > b.first;
+	}
+};
+
+class D_Node {
+public:
+	int cost;
+	int current;
+	int destination;
+	D_Node* link = nullptr;
+	D_Node(int current = -1, int destination = -1, int cost = 0) {
+		this->cost = cost; this->destination = destination; this->current = current;
+	}
+	void setDestination(int destination) { this->destination = destination; }
+	void setCost(int cost) { this->cost = cost; }
+	void setCurrent(int current) { this->current = current; }
+	void setLink(D_Node* link) { (this->link) = link; }
+	int getDestination() const { return destination; }
+	int getCost() const { return cost; }
+	int getCurrent() const { return current; }
+	D_Node* getLink() { return link; }
+	bool operator==(const D_Node* rhs) const {
+		if ((this->cost == rhs->cost) &&
+			(this->destination == rhs->destination) &&
+			(this->current == rhs->current)) return true;
+		return false;
+	}
+};
+
+class linked_list : public D_Node { //list는 adjecent 역할을 수행한다.
+private:
+	D_Node* Tail;
+	D_Node* Head;
+	int cnt = 0;
+public:
+	void push(int start, int end, int toll) {
+		if (cnt == 0) {
+			Tail = new D_Node(start, end, toll);
+			Head = Tail;
+			cnt++;
+			return;
+		}
+		D_Node* new_node = new D_Node;
+		Tail->setLink(new_node);
+
+		new_node->setCost(toll);
+		new_node->setCurrent(start);
+		new_node->setDestination(end);
+		Tail = new_node;  cnt++;
+	}
+	D_Node* getTail() { return Tail; }
+	D_Node* getRoot() { return Head; }
+	bool isEmpty() {
+		if (cnt == 0) return true;
+		return false;
+	}
+	int getCnt() { return cnt; }
+};
+
+priority_queue <pair<int, int>, vector<pair<int, int>>, Compare> pq;// (비용, 다음정점)
+linked_list *list;
